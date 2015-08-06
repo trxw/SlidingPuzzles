@@ -1,15 +1,15 @@
 
 public class Block {
-
-	int topLeftx, topLefty, bottomRightx, bottomRighty;
+	Point size;
+	public Block(int yLength, int xLength){
+		size= new Point(xLenght,ylenght);
+	}
+	public Point size(){
+		return size;
+	}
 	
-	public Block(int topLeftx, int topLefty, int bottomRightx, 
-				int bottomRighty){
-		
-		this.topLeftx = topLeftx;
-		this.topLefty = topLefty;
-		this.bottomRightx = bottomRightx;
-		this.bottomRighty = bottomRighty;
+	public move(){
 		
 	}
+	
 }
