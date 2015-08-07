@@ -16,6 +16,7 @@ public class Tray {
 	 * Initializes a tray with lines from Init file
 	 * 
 	 * @param lineInitArr
+	 *            lines in the init file passes as ArrayList of Strings
 	 */
 
 	public Tray(ArrayList<String> lineInitArr) {
@@ -53,6 +54,12 @@ public class Tray {
 		}
 	}
 
+	/**
+	 * use to construct a tray which will end up being the children of the Tray
+	 * 
+	 * @param pTray
+	 *            the parent Tray to the Tray being created
+	 */
 	@SuppressWarnings("unchecked")
 	public Tray(Tray pTray) {
 		// does noting
@@ -64,27 +71,34 @@ public class Tray {
 	}
 
 	/**
-	 * Returns a string of all blocks positions
+	 * Returns a string of all blocks positions Concatenated to make a unique
+	 * hash value
 	 */
 	@Override
 	public String toString() {
-		String S="";
-		for (Point P:heads){
-			Block B=board[P.y][P.x];
-			int xbottom= P.x+ B.size.x-1;
-			int ybottom= P.y+B.size.y-1;
-			S+=P.y+ P.x+ ybottom+ xbottom; 
+		String S = "";
+		for (Point P : heads) {
+			Block B = board[P.y][P.x];
+			int xbottom = P.x + B.size.x - 1;
+			int ybottom = P.y + B.size.y - 1;
+			S += P.y + P.x + ybottom + xbottom;
 		}
 		return S;
 	}
 
 	/**
+	 * returns true if the given block can move in the given direction move from
+	 * the current location
 	 * 
 	 * @param block
-	 * @param newP
-	 *            1:- up
-	 * 
-	 * @return
+	 *            Block object under consideration of moment
+	 * @param oldP
+	 *            Point object which has the coordinate of the block on the
+	 *            board of the this Tray
+	 * @param move
+	 *            a Point object which indicates which direction to move a unit
+	 *            amount
+	 * @return returns true if movement is valid else it will return false!
 	 */
 	public boolean canMove(Block block, Point oldP, Point move) {
 		Point p = new Point(oldP.x + move.x, oldP.y + move.y);
@@ -129,15 +143,21 @@ public class Tray {
 	}
 
 	/**
-	 * Should return a new object
+	 * Creates a Tray object and returns it after cloning this Tray and moving
+	 * the given block in the given direction (move) from the current location
+	 * (oldP)
 	 * 
 	 * @param block
-	 * @param newP
-	 *            :
-	 * @return
+	 *            Block object under consideration of moment
+	 * @param oldP
+	 *            Point object which has the coordinate of the block on the
+	 *            board of the this Tray
+	 * @param move
+	 *            a Point object which indicates which direction to move a unit
+	 *            amount
+	 * @return returns the new Tray objects that was created
 	 */
 	public Tray move(Block block, Point oldP, Point move) {
-		// update all instance Ver....
 
 		Tray T = new Tray(this);
 		// update T...
@@ -145,10 +165,9 @@ public class Tray {
 		Point p = new Point(oldP.x + move.x, oldP.y + move.y);
 		Point oldF = new Point(oldP.x + block.size().x, oldP.y + block.size().y);
 
-		// T.movefromparent;
 		if (move.x == 0) {
 			if (move.y > 0) { // move down
-				
+
 				for (int i = oldP.x; i < oldF.x; i++) {
 					T.board[oldF.y][i] = b;
 				}
@@ -183,8 +202,8 @@ public class Tray {
 		// update the heads
 		T.heads.get(T.heads.indexOf(oldP)).translate(move.x, move.y);
 		// update the movesFromParent -of the head
-		T.moveFromParent = oldP.y + " " + oldP.x + " " + p.y + " "
-				+ p.x;
+		T.moveFromParent = oldP.y + " " + oldP.x + " " + p.y + " " + p.x;
+		this.children.push(T);
 		return T;
 	}
 
@@ -200,8 +219,16 @@ public class Tray {
 			}
 		}
 	}
-	 
-	public boolean equals(Tray T){
+
+	/**
+	 * given a Tray object it compares the Tray with this tray and returns true
+	 * if they are equal else returns false
+	 * 
+	 * @param T
+	 *            the Tray object to be compared to this
+	 * @return true if they are equal else returns false
+	 */
+	public boolean equals(Tray T) {
 		return this.toString().equals(T.toString());
 	}
 }
