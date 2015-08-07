@@ -10,7 +10,7 @@ import java.util.Stack;
 public class Solver {
 	ArrayList<String> lineInit;
 	ArrayList<String> lineGoal;
-	static String BS = "/";
+	static String BS = "\\";
 	static String currDir = System.getProperty("user.dir") + BS;
 	Stack<Tray> fringe;
 	HashSet<String> visited;
@@ -21,6 +21,7 @@ public class Solver {
 	 */
 	public Solver() {
 		// should be initialized in the isvalidinput method
+		
 		lineInit = new ArrayList<String>();
 		lineGoal = new ArrayList<String>();
 		fringe = new Stack<Tray>();
@@ -94,11 +95,11 @@ public class Solver {
 	}
 
 	/**
-	 * prints out all the moves from the start to Goal (X)
-	 * 
+	 * prints out all the moves from the start to Goal(X)
 	 * @param X
 	 *            the Goal Tray
 	 */
+	
 	public void moves(Tray X) {
 		Stack<String> S = new Stack<String>();
 		// avoid visiting the first tray since it has no moves
@@ -121,10 +122,16 @@ public class Solver {
 	 *            
 	 * @return true if the input files are valid else false - must be
 	 *         bullet-proof
+	 * @throws IOException 
+	 * @throws FileNotFoundException 
 	 */
-	public boolean isValidInput(String[] args) {
+	public boolean isValidInput(String[] args) throws FileNotFoundException, IOException {
+		fileReader( lineInit, args[0]);
+		fileReader( lineGoal, args[1]);
+		initTray= new Tray(lineInit);
+		return true;
+		
 		// check validity of args
-
 		/**
 		 * possible errors for init file
 		 * 
@@ -136,7 +143,7 @@ public class Solver {
 		 */
 
 		// update the fringe...(ie. create first Tray....)
-		return false;
+		
 	}
 
 	/**
@@ -163,6 +170,7 @@ public class Solver {
 				lineArr.add(linePotato);
 			}
 		}
+			
 	}
 
 	/**
@@ -172,8 +180,10 @@ public class Solver {
 	 *            a String Array that contains the file names for init and goal
 	 *            files
 	 * 			 args[0] is init file nae and args[1] is goal file name
+	 * @throws IOException 
+	 * @throws FileNotFoundException 
 	 */
-	public static void main(String[] args) {
+	public static void main(String[] args) throws FileNotFoundException, IOException {
 		Solver s = new Solver();
 		if (args.length == 2) {
 			// check if args[0] and args[1] files exit

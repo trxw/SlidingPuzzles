@@ -33,18 +33,16 @@ public class Tray {
 		int ybottom;
 		int xsize;
 		int ysize;
+		heads= new ArrayList<Point>();
 		for (String line : lineInitArr.subList(1, lineInitArr.size())) {
-
 			xtop = Integer.parseInt(line.split("\\s+")[1]);
 			ytop = Integer.parseInt(line.split("\\s+")[0]);
 			heads.add(new Point(xtop, ytop));
 			xbottom = Integer.parseInt(line.split("\\s+")[3]);
 			ybottom = Integer.parseInt(line.split("\\s+")[2]);
-			xsize = xbottom - xtop;
-			ysize = ybottom - ytop;
-
+			xsize = xbottom - xtop+1;
+			ysize = ybottom - ytop+1;
 			Block b = new Block(ysize, xsize);
-
 			for (int j = ytop; j <= ybottom; j++) {
 				for (int i = xtop; i <= xbottom; i++) {
 					this.board[j][i] = b;
@@ -81,7 +79,7 @@ public class Tray {
 			Block B = board[P.y][P.x];
 			int xbottom = P.x + B.size.x - 1;
 			int ybottom = P.y + B.size.y - 1;
-			S += P.y + P.x + ybottom + xbottom;
+			S += P.y +""+ P.x +""+ ybottom+ ""+ xbottom;
 		}
 		return S;
 	}
@@ -103,6 +101,7 @@ public class Tray {
 	public boolean canMove(Block block, Point oldP, Point move) {
 		Point p = new Point(oldP.x + move.x, oldP.y + move.y);
 		Point oldF = new Point(oldP.x + block.size().x, oldP.y + block.size().y);
+		
 		if (p.x < 0 || p.y < 0 || p.x >= xLenght || p.y >= yLenght) {
 			return false;
 		} else {
@@ -199,10 +198,11 @@ public class Tray {
 				}
 			}
 		}
-		// update the heads
-		T.heads.get(T.heads.indexOf(oldP)).translate(move.x, move.y);
 		// update the movesFromParent -of the head
 		T.moveFromParent = oldP.y + " " + oldP.x + " " + p.y + " " + p.x;
+		// update the heads
+		T.heads.get(T.heads.indexOf(oldP)).translate(move.x, move.y);
+		
 		this.children.push(T);
 		return T;
 	}
