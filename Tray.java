@@ -1,12 +1,13 @@
 import java.awt.Point;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Stack;
 
-public class Tray {
-	int xLenght, yLenght;
+public class Tray implements Comparable<Tray>{
+	int xLength, yLength;
 	String moveFromParent;
 	Block[][] board;
-	Stack<Tray> children;
+	
 	ArrayList<Point> heads;
 	Tray parentTray;
 	static Point[] moves = { new Point(0, -1), new Point(0, +1),
@@ -20,11 +21,10 @@ public class Tray {
 	 */
 
 	public Tray(ArrayList<String> lineInitArr) {
-		this.children = new Stack<Tray>();
-
-		xLenght = Integer.parseInt(lineInitArr.get(0).split("\\s+")[1]);
-		yLenght = Integer.parseInt(lineInitArr.get(0).split("\\s+")[0]);
-		this.board = new Block[this.yLenght][this.xLenght];
+	
+		xLength = Integer.parseInt(lineInitArr.get(0).split("\\s+")[1]);
+		yLength = Integer.parseInt(lineInitArr.get(0).split("\\s+")[0]);
+		this.board = new Block[this.yLength][this.xLength];
 		parentTray = null;
 		// For blocks:
 		int xtop;
@@ -61,8 +61,8 @@ public class Tray {
 	@SuppressWarnings("unchecked")
 	public Tray(Tray pTray) {
 		// does noting
-		xLenght = pTray.xLenght;
-		yLenght = pTray.yLenght;
+		xLength = pTray.xLength;
+		yLength = pTray.yLength;
 		parentTray = pTray;
 		heads = (ArrayList<Point>) pTray.heads.clone();
 		board = pTray.board.clone();
@@ -73,13 +73,14 @@ public class Tray {
 	 * hash value
 	 */
 	@Override
-	public String toString() {
+	public String toString() {//reCoded, and double-checked, adjusted the format 
+								//to the required output format
 		String S = "";
 		for (Point P : heads) {
 			Block B = board[P.y][P.x];
 			int xbottom = P.x + B.size.x - 1;
 			int ybottom = P.y + B.size.y - 1;
-			S += P.y +""+ P.x +""+ ybottom+ ""+ xbottom;
+			S += P.y +" "+ P.x +" "+ ybottom+ " "+ xbottom+"\n";
 		}
 		return S;
 	}
@@ -90,7 +91,7 @@ public class Tray {
 	 * 
 	 * @param block
 	 *            Block object under consideration of moment
-	 * @param oldP
+	 * @param oldTopLeft
 	 *            Point object which has the coordinate of the block on the
 	 *            board of the this Tray
 	 * @param move
@@ -98,49 +99,60 @@ public class Tray {
 	 *            amount
 	 * @return returns true if movement is valid else it will return false!
 	 */
-	public boolean canMove(Block block, Point oldP, Point move) {
-		Point p = new Point(oldP.x + move.x, oldP.y + move.y);
-		Point oldF = new Point(oldP.x + block.size().x, oldP.y + block.size().y);
+	public boolean canMove(Block block, Point oldTopLeft, Point move) {//reCoded, and double-checked
+		Point newTopLeft     = new Point(oldTopLeft.x + move.x, oldTopLeft.y + move.y);
+		Point newBottomRight = new Point(newTopLeft.x + block.size().x-1, newTopLeft.y + block.size().y-1);
 		
-		if (p.x < 0 || p.y < 0 || p.x >= xLenght || p.y >= yLenght) {
-			return false;
-		} else {
-			// generate all the in
-			if (move.x == 0) {
-				if (move.y > 0) {
-					for (int i = oldP.x; i < oldF.x; i++) {
-						if (board[oldF.y][i] != null) {
-							return false;
-						}
-					}
-				} else {
-					for (int i = oldP.x; i < oldF.x; i++) {
-						if (board[p.y][i] != null) {
-							return false;
-						}
+		if ( move.y > 0 ) {
+			if( newBottomRight.y<this.yLength ){
+				for (int i = newTopLeft.x; i <= newBottomRight.x; i++) {
+					if (board[newBottomRight.y][i]!=null){
+						return false;
 					}
 				}
-			} else {
-				if (move.x > 0) {
-					for (int j = oldP.y; j < oldF.y; j++) {
-						if (board[j][oldF.x] != null) {
-							return false;
-						}
-					}
-				} else {
-					for (int j = oldP.y; j < oldF.y; j++) {
-						if (board[j][p.x] != null) {
-							return false;
-						}
-					}
-				}
+			}else{
+				return false;
+			}
 
+		} else if ( move.y<0 ){
+			if( newTopLeft.y>=0 ){
+				for (int i = newTopLeft.x; i <= newBottomRight.x; i++) {
+					if (board[newTopLeft.y][i]!=null){
+						return false;
+					}
+				}
+			}else{
+				return false;
+			}
+		}else if( move.x > 0){
+			if( newBottomRight.x<this.xLength ){
+				for (int j = newTopLeft.y; j <= newBottomRight.y; j++) {
+					if (board[j][newBottomRight.x]!=null){
+						return false;
+					}
+				}	
+			}else{
+				return false;
+			}
+
+
+		}else if( move.x < 0 ){
+			if ( newTopLeft.x>=0 ){
+				for (int j = newTopLeft.y; j <= newBottomRight.y; j++){
+					if (board[j][newTopLeft.x]!=null){
+						return false;
+					}
+				}
+			}else{
+				return false;
 			}
 		}
+
 
 		return true;
 	}
 
+	
 	/**
 	 * Creates a Tray object and returns it after cloning this Tray and moving
 	 * the given block in the given direction (move) from the current location
@@ -148,7 +160,7 @@ public class Tray {
 	 * 
 	 * @param block
 	 *            Block object under consideration of moment
-	 * @param oldP
+	 * @param oldTopLeft
 	 *            Point object which has the coordinate of the block on the
 	 *            board of the this Tray
 	 * @param move
@@ -156,68 +168,64 @@ public class Tray {
 	 *            amount
 	 * @return returns the new Tray objects that was created
 	 */
-	public Tray move(Block block, Point oldP, Point move) {
+	public Tray move(Block block, Point oldTopLeft, Point move) {//reCoded
 
 		Tray T = new Tray(this);
 		// update T...
-		Block b = board[oldP.y][oldP.x];
-		Point p = new Point(oldP.x + move.x, oldP.y + move.y);
-		Point oldF = new Point(oldP.x + block.size().x, oldP.y + block.size().y);
+		Block b = board[oldTopLeft.y][oldTopLeft.x];
+		
+		Point newTopLeft     = new Point(oldTopLeft.x + move.x, oldTopLeft.y + move.y);
+		Point newBottomRight = new Point(newTopLeft.x + block.size().x-1, newTopLeft.y + block.size().y-1);
+		
+		if ( move.y > 0 ) {
+				for (int i = newTopLeft.x; i <= newBottomRight.x; i++) {
+					T.board[newBottomRight.y][i] = b;
+					T.board[newTopLeft.y][i]     = null;
+				}
 
-		if (move.x == 0) {
-			if (move.y > 0) { // move down
-
-				for (int i = oldP.x; i < oldF.x; i++) {
-					T.board[oldF.y][i] = b;
-				}
-				for (int i = oldP.x; i < oldF.x; i++) {
-					T.board[oldP.y][i] = b;
-				}
-			} else { // move up
-				for (int i = oldP.x; i < oldF.x; i++) {
-					T.board[p.y][i] = b;
-				}
-				for (int i = oldP.x; i < oldF.x; i++) {
-					T.board[oldF.y - 1][i] = b;
-				}
+		} else if ( move.y<0 ){
+			for (int i = newTopLeft.x; i <= newBottomRight.x; i++) {
+				T.board[newBottomRight.y][i] = null;
+				T.board[newTopLeft.y][i]     = b;
 			}
-		} else {
-			if (move.x > 0) { // move right
-				for (int j = oldP.y; j < oldF.y; j++) {
-					T.board[j][oldF.x] = b;
-				}
-				for (int j = oldP.y; j < oldF.y; j++) {
-					T.board[j][oldP.x] = null;
-				}
-			} else { // move left
-				for (int j = oldP.y; j < oldF.y; j++) {
-					T.board[j][p.x] = b;
-				}
-				for (int j = oldP.y; j < oldF.y; j++) {
-					T.board[j][oldF.x - 1] = b;
-				}
+
+		}else if( move.x > 0){
+			for (int j = newTopLeft.y; j <= newBottomRight.y; j++) {
+				T.board[j][newBottomRight.x] = b;
+				T.board[j][newTopLeft.x]     = null;
+			}
+		} else if( move.x < 0 ){
+			for (int j = newTopLeft.y; j <= newBottomRight.y; j++) {
+				T.board[j][newBottomRight.x] = null;
+				T.board[j][newTopLeft.x]     = b;
+	
 			}
 		}
-		// update the movesFromParent -of the head
-		T.moveFromParent = oldP.y + " " + oldP.x + " " + p.y + " " + p.x;
-		// update the heads
-		T.heads.get(T.heads.indexOf(oldP)).translate(move.x, move.y);
+
+////		// update the movesFromParent -of the head
+		T.moveFromParent = oldTopLeft.y + " " + oldTopLeft.x + " " + newTopLeft.y + " " + newTopLeft.x;
+//		// update the heads
+		T.heads.get(T.heads.indexOf(oldTopLeft)).translate(move.x, move.y);
 		
-		this.children.push(T);
 		return T;
 	}
 
 	/**
 	 * Sets all legal children of the Tray object into the children stack
 	 */
-	public void findLegitChildren() {
+	public Stack<Tray> children() {
+		Stack<Tray> children = new Stack<Tray>();
+		
 		for (Point h : heads) {
 			for (Point move : moves) {
 				if (canMove(board[h.y][h.x], h, move)) {
+					System.out.println("can move");
 					children.add(move(board[h.y][h.x], h, move));
+					
 				}
 			}
 		}
+		return children;
 	}
 
 	/**
@@ -228,7 +236,24 @@ public class Tray {
 	 *            the Tray object to be compared to this
 	 * @return true if they are equal else returns false
 	 */
-	public boolean equals(Tray T) {
-		return this.toString().equals(T.toString());
+	@Override
+	public boolean equals(Object T) {
+		T = (Tray) T;
+		return (this.toString().equals(T.toString()));
 	}
+
+	
+	
+	@Override
+	public int hashCode(){
+		return this.toString().hashCode();
+		
+	}
+
+	@Override
+	public int compareTo(Tray o) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+	
 }

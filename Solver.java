@@ -10,7 +10,7 @@ import java.util.Stack;
 public class Solver {
 	ArrayList<String> lineInit;
 	ArrayList<String> lineGoal;
-	static String BS = "\\";
+	static String BS = "/";
 	static String currDir = System.getProperty("user.dir") + BS;
 	Stack<Tray> fringe;
 	HashSet<String> visited;
@@ -26,6 +26,7 @@ public class Solver {
 		lineGoal = new ArrayList<String>();
 		fringe = new Stack<Tray>();
 		visited = new HashSet<String>();
+		
 	}
 
 	/**
@@ -35,18 +36,24 @@ public class Solver {
 		fringe.push(initTray);
 		while (!fringe.isEmpty()) {
 			Tray X = fringe.pop();
+			System.out.println(X.toString());
 			if (isGoal(X)) {
+				System.out.println("Going home");
 				moves(X);
 			} else {
-				X.findLegitChildren();
-				for (Tray XChild : X.children) {
+				
+				for(Tray XChild: X.children()) {
+					System.out.println(XChild.toString());
 					if (!fringe.contains(XChild)
 							&& !visited.contains(XChild.toString())) {
+						System.out.println("hi");
 						fringe.add(XChild);
 					}
+
 				}
-				visited.add(X.toString());
+				
 			}
+			visited.add(X.toString());
 		}
 		// if no goal is reached by the end do noting and just exist
 	}
@@ -163,12 +170,17 @@ public class Solver {
 	public void fileReader(ArrayList<String> lineArr, String fileName)
 			throws FileNotFoundException, IOException {
 		String file = currDir + fileName;
+		try{
 		try (BufferedReader br = new BufferedReader(new FileReader(file))) {
 			String linePotato;
 			while ((linePotato = br.readLine()) != null) {
 				// process the line.
 				lineArr.add(linePotato);
 			}
+		}
+		}catch(FileNotFoundException e){
+			System.out.println(file);
+
 		}
 			
 	}
