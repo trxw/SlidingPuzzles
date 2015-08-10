@@ -202,7 +202,7 @@ public class Tray implements Comparable<Tray>{
 		}else if( move.x > 0){
 			for (int j = newTopLeft.y; j <= newBottomRight.y; j++) {
 				T.board[j][newBottomRight.x] = b;
-				T.board[j][newTopLeft.x]     = null;
+				T.board[j][oldTopLeft.x]     = null;
 			}
 		} else if( move.x < 0 ){
 			for (int j = newTopLeft.y; j <= newBottomRight.y; j++) {
