@@ -10,6 +10,7 @@ public class Tray implements Comparable<Tray>{
 	
 	ArrayList<Point> heads;
 	Tray parentTray;
+	public int yLenght;
 	static Point[] moves = { new Point(0, -1), new Point(0, +1),
 			new Point(-1, 0), new Point(+1, 0) };
 
@@ -76,11 +77,19 @@ public class Tray implements Comparable<Tray>{
 	public String toString() {//reCoded, and double-checked, adjusted the format 
 								//to the required output format
 		String S = "";
+		int size = heads.size();
+		int counter = 0;
 		for (Point P : heads) {
+			System.out.println("the head is" + P);
 			Block B = board[P.y][P.x];
 			int xbottom = P.x + B.size.x - 1;
 			int ybottom = P.y + B.size.y - 1;
-			S += P.y +" "+ P.x +" "+ ybottom+ " "+ xbottom+"\n";
+			counter += 1;
+			if(counter<size){
+				S += P.y +" "+ P.x +" "+ ybottom+ " "+ xbottom+'\n';
+			}else{
+				S += P.y +" "+ P.x +" "+ ybottom+ " "+ xbottom;				
+			}
 		}
 		return S;
 	}
@@ -171,6 +180,7 @@ public class Tray implements Comparable<Tray>{
 	public Tray move(Block block, Point oldTopLeft, Point move) {//reCoded
 
 		Tray T = new Tray(this);
+		//System.out.println(T);
 		// update T...
 		Block b = board[oldTopLeft.y][oldTopLeft.x];
 		
@@ -205,8 +215,9 @@ public class Tray implements Comparable<Tray>{
 ////		// update the movesFromParent -of the head
 		T.moveFromParent = oldTopLeft.y + " " + oldTopLeft.x + " " + newTopLeft.y + " " + newTopLeft.x;
 //		// update the heads
-		T.heads.get(T.heads.indexOf(oldTopLeft)).translate(move.x, move.y);
-		
+		Point phead = T.heads.remove(T.heads.indexOf(oldTopLeft));
+		phead.translate(move.x, move.y);
+		T.heads.add(phead);
 		return T;
 	}
 
@@ -246,7 +257,13 @@ public class Tray implements Comparable<Tray>{
 	
 	@Override
 	public int hashCode(){
-		return this.toString().hashCode();
+		String s = this.toString();
+		String[] arr = s.split(System.getProperty("line.separator"));
+		int hash = 0;
+		for(String str: arr){
+			hash += str.hashCode()+101;
+		}
+		return hash;
 		
 	}
 
