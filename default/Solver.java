@@ -21,7 +21,7 @@ public class Solver {
 	 */
 	public Solver() {
 		// should be initialized in the isvalidinput method
-		
+
 		lineInit = new ArrayList<String>();
 		lineGoal = new ArrayList<String>();
 		fringe = new Stack<Tray>();
@@ -37,18 +37,19 @@ public class Solver {
 			Tray X = fringe.pop();
 			if (isGoal(X)) {
 				moves(X);
+				break;
 			} else {
 				X.findLegitChildren();
-				for (Tray XChild : X.children) {
-					if (!fringe.contains(XChild)
-							&& !visited.contains(XChild.toString())) {
-						fringe.add(XChild);
-					}
+					for (Tray XChild : X.children) {
+						if (!fringe.contains(XChild)
+								&& !visited.contains(XChild.toString())) {
+							fringe.add(XChild);
+						}
+					
 				}
 				visited.add(X.toString());
 			}
 		}
-		// if no goal is reached by the end do noting and just exist
 	}
 
 	/**
@@ -96,10 +97,11 @@ public class Solver {
 
 	/**
 	 * prints out all the moves from the start to Goal(X)
+	 * 
 	 * @param X
 	 *            the Goal Tray
 	 */
-	
+
 	public void moves(Tray X) {
 		Stack<String> S = new Stack<String>();
 		// avoid visiting the first tray since it has no moves
@@ -117,20 +119,21 @@ public class Solver {
 	 * 
 	 * @param args
 	 *            a String Array that contains the file names for init and goal
-	 *            files - must initialize instant Variables
-	 *            args[0] is init file nae and args[1] is goal file name
-	 *            
+	 *            files - must initialize instant Variables args[0] is init file
+	 *            nae and args[1] is goal file name
+	 * 
 	 * @return true if the input files are valid else false - must be
 	 *         bullet-proof
-	 * @throws IOException 
-	 * @throws FileNotFoundException 
+	 * @throws IOException
+	 * @throws FileNotFoundException
 	 */
-	public boolean isValidInput(String[] args) throws FileNotFoundException, IOException {
-		fileReader( lineInit, args[0]);
-		fileReader( lineGoal, args[1]);
-		initTray= new Tray(lineInit);
+	public boolean isValidInput(String[] args) throws FileNotFoundException,
+			IOException {
+		fileReader(lineInit, args[0]);
+		fileReader(lineGoal, args[1]);
+		initTray = new Tray(lineInit);
 		return true;
-		
+
 		// check validity of args
 		/**
 		 * possible errors for init file
@@ -143,21 +146,21 @@ public class Solver {
 		 */
 
 		// update the fringe...(ie. create first Tray....)
-		
+
 	}
 
 	/**
-	 * Reads given file line by line and adds it to the given 
-	 * ArrayList as a String
+	 * Reads given file line by line and adds it to the given ArrayList as a
+	 * String
 	 * 
 	 * @param lineArr
-	 *       pointer to the ArrayList to add the read lines
+	 *            pointer to the ArrayList to add the read lines
 	 * @param fileName
-	 *         name of the file to be read (lineInit or lineGoal)
+	 *            name of the file to be read (lineInit or lineGoal)
 	 * @throws IOException
-	 *          not handled (assume that isValidinput was true)
+	 *             not handled (assume that isValidinput was true)
 	 * @throws FileNotFoundException
-	 *		  not handled (assume that isValidinput was true)
+	 *             not handled (assume that isValidinput was true)
 	 */
 
 	public void fileReader(ArrayList<String> lineArr, String fileName)
@@ -170,7 +173,7 @@ public class Solver {
 				lineArr.add(linePotato);
 			}
 		}
-			
+
 	}
 
 	/**
@@ -178,12 +181,12 @@ public class Solver {
 	 * 
 	 * @param args
 	 *            a String Array that contains the file names for init and goal
-	 *            files
-	 * 			 args[0] is init file nae and args[1] is goal file name
-	 * @throws IOException 
-	 * @throws FileNotFoundException 
+	 *            files args[0] is init file nae and args[1] is goal file name
+	 * @throws IOException
+	 * @throws FileNotFoundException
 	 */
-	public static void main(String[] args) throws FileNotFoundException, IOException {
+	public static void main(String[] args) throws FileNotFoundException,
+			IOException {
 		Solver s = new Solver();
 		if (args.length == 2) {
 			// check if args[0] and args[1] files exit

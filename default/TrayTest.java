@@ -9,7 +9,7 @@ public class TrayTest extends TestCase {
 		ArrayList<String> arr= new ArrayList<String>();
 		arr.add("3 2");
 		arr.add("0 0 0 0");
-		arr.add("1 1 1 1");
+		arr.add("1 1 2 1");
 		Tray T= new Tray(arr);
 		Point P= new Point(0,0);
 		Point P1= new Point(1,1);
@@ -26,7 +26,8 @@ public class TrayTest extends TestCase {
 		assertTrue(T.board[0][1]==null);
 		// check the board and the block
 		assertTrue(T.board[0][0].size().equals(P1));
-		assertTrue(T.board[1][1].size().equals(P1));
+		
+		assertTrue(T.board[1][1].size().equals(new Point(1,2)));
 		
 	}
 	
@@ -45,7 +46,7 @@ public class TrayTest extends TestCase {
 	
 	public void testCanMove(){
 		ArrayList<String> arr= new ArrayList<String>();
-		arr.add("3 2");
+		arr.add("2 2");
 		arr.add("0 0 0 0");
 		arr.add("1 1 1 1");
 		Tray T= new Tray(arr);
@@ -56,15 +57,19 @@ public class TrayTest extends TestCase {
 		Point oldP= T.heads.get(0);
 		Point oldP1= T.heads.get(1);
 		 // checks we can't go out of the bounds of the board
-		assertFalse(T.canMove(B,oldP, moves[0]));
+		//B
 		assertFalse(T.canMove(B,oldP, moves[2]));
+		assertFalse(T.canMove(B,oldP, moves[0]));
+		//B1
+		assertFalse(T.canMove(B1,oldP1, moves[1]));
 		assertFalse(T.canMove(B1,oldP1, moves[3]));
 		
 		 // checks we can go to an empty space on the board
+		//B
 		assertTrue(T.canMove(B,oldP, moves[3]));
 		assertTrue(T.canMove(B,oldP, moves[1]));
+		//B1
 		assertTrue(T.canMove(B1,oldP1, moves[0]));
-		assertTrue(T.canMove(B1,oldP1, moves[1]));
 		assertTrue(T.canMove(B1,oldP1, moves[2]));
 		
 		
@@ -84,7 +89,6 @@ public class TrayTest extends TestCase {
 		assertFalse(T1.canMove(BB2,oldPP2, moves[2]));	
 	}
 	public void testmove(){
-		
 		ArrayList<String> arr= new ArrayList<String>();
 		arr.add("3 2");
 		arr.add("0 0 0 0");
@@ -111,9 +115,8 @@ public class TrayTest extends TestCase {
 		// check that the head in NewT is reset right
 		Point P= new Point (1,0);
 		assertTrue(NewT.heads.get(0).equals(P));
-		
-		
-		
+		// 
+		assertTrue(NewT.board[0][0]==null);
 	}
 }
 

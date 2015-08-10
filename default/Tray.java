@@ -21,7 +21,6 @@ public class Tray {
 
 	public Tray(ArrayList<String> lineInitArr) {
 		this.children = new Stack<Tray>();
-
 		xLenght = Integer.parseInt(lineInitArr.get(0).split("\\s+")[1]);
 		yLenght = Integer.parseInt(lineInitArr.get(0).split("\\s+")[0]);
 		this.board = new Block[this.yLenght][this.xLenght];
@@ -33,15 +32,15 @@ public class Tray {
 		int ybottom;
 		int xsize;
 		int ysize;
-		heads= new ArrayList<Point>();
+		heads = new ArrayList<Point>();
 		for (String line : lineInitArr.subList(1, lineInitArr.size())) {
 			xtop = Integer.parseInt(line.split("\\s+")[1]);
 			ytop = Integer.parseInt(line.split("\\s+")[0]);
 			heads.add(new Point(xtop, ytop));
 			xbottom = Integer.parseInt(line.split("\\s+")[3]);
 			ybottom = Integer.parseInt(line.split("\\s+")[2]);
-			xsize = xbottom - xtop+1;
-			ysize = ybottom - ytop+1;
+			xsize = xbottom - xtop + 1;
+			ysize = ybottom - ytop + 1;
 			Block b = new Block(ysize, xsize);
 			for (int j = ytop; j <= ybottom; j++) {
 				for (int i = xtop; i <= xbottom; i++) {
@@ -58,14 +57,31 @@ public class Tray {
 	 * @param pTray
 	 *            the parent Tray to the Tray being created
 	 */
-	@SuppressWarnings("unchecked")
 	public Tray(Tray pTray) {
 		// does noting
 		xLenght = pTray.xLenght;
 		yLenght = pTray.yLenght;
 		parentTray = pTray;
-		heads = (ArrayList<Point>) pTray.heads.clone();
-		board = pTray.board.clone();
+		board = new Block[yLenght][xLenght];
+		int xtop;
+		int ytop;
+		int xbottom;
+		int ybottom;
+		heads = new ArrayList<Point>();
+		for (Point H : pTray.heads) {
+			heads.add(H);
+			xtop = H.x;
+			ytop = H.y;
+			xbottom = xtop + pTray.board[ytop][xtop].size().x - 1;
+			ybottom = ytop + pTray.board[ytop][xtop].size().y - 1;
+			Block b = pTray.board[ytop][xtop];
+			for (int j = ytop; j <= ybottom; j++) {
+				for (int i = xtop; i <= xbottom; i++) {
+					this.board[j][i] = b;
+				}
+			}
+		}
+		children = new Stack<Tray>();
 	}
 
 	/**
@@ -79,7 +95,7 @@ public class Tray {
 			Block B = board[P.y][P.x];
 			int xbottom = P.x + B.size.x - 1;
 			int ybottom = P.y + B.size.y - 1;
-			S += P.y +""+ P.x +""+ ybottom+ ""+ xbottom;
+			S += P.y + "" + P.x + "" + ybottom + "" + xbottom;
 		}
 		return S;
 	}
@@ -101,43 +117,49 @@ public class Tray {
 	public boolean canMove(Block block, Point oldP, Point move) {
 		Point p = new Point(oldP.x + move.x, oldP.y + move.y);
 		Point oldF = new Point(oldP.x + block.size().x, oldP.y + block.size().y);
-		
-		if (p.x < 0 || p.y < 0 || p.x >= xLenght || p.y >= yLenght) {
-			return false;
-		} else {
-			// generate all the in
-			if (move.x == 0) {
-				if (move.y > 0) {
-					for (int i = oldP.x; i < oldF.x; i++) {
-						if (board[oldF.y][i] != null) {
-							return false;
-						}
-					}
-				} else {
-					for (int i = oldP.x; i < oldF.x; i++) {
-						if (board[p.y][i] != null) {
-							return false;
-						}
+		// generate all the in
+		if (move.x == 0) {
+			if (move.y > 0) {
+				if (oldF.y >= yLenght) {
+					return false;
+				}
+				for (int i = oldP.x; i < oldF.x; i++) {
+					if (board[oldF.y][i] != null) {
+						return false;
 					}
 				}
 			} else {
-				if (move.x > 0) {
-					for (int j = oldP.y; j < oldF.y; j++) {
-						if (board[j][oldF.x] != null) {
-							return false;
-						}
-					}
-				} else {
-					for (int j = oldP.y; j < oldF.y; j++) {
-						if (board[j][p.x] != null) {
-							return false;
-						}
+				if (p.y < 0) {
+					return false;
+				}
+				for (int i = oldP.x; i < oldF.x; i++) {
+					if (board[p.y][i] != null) {
+						return false;
 					}
 				}
-
 			}
-		}
+		} else {
+			if (move.x > 0) {
+				if (oldF.x >= xLenght) {
+					return false;
+				}
+				for (int j = oldP.y; j < oldF.y; j++) {
+					if (board[j][oldF.x] != null) {
+						return false;
+					}
+				}
+			} else {
+				if (p.x < 0) {
+					return false;
+				}
+				for (int j = oldP.y; j < oldF.y; j++) {
+					if (board[j][p.x] != null) {
+						return false;
+					}
+				}
+			}
 
+		}
 		return true;
 	}
 
@@ -171,14 +193,14 @@ public class Tray {
 					T.board[oldF.y][i] = b;
 				}
 				for (int i = oldP.x; i < oldF.x; i++) {
-					T.board[oldP.y][i] = b;
+					T.board[oldP.y][i] = null;
 				}
 			} else { // move up
 				for (int i = oldP.x; i < oldF.x; i++) {
 					T.board[p.y][i] = b;
 				}
 				for (int i = oldP.x; i < oldF.x; i++) {
-					T.board[oldF.y - 1][i] = b;
+					T.board[oldF.y - 1][i] = null;
 				}
 			}
 		} else {
@@ -194,15 +216,14 @@ public class Tray {
 					T.board[j][p.x] = b;
 				}
 				for (int j = oldP.y; j < oldF.y; j++) {
-					T.board[j][oldF.x - 1] = b;
+					T.board[j][oldF.x - 1] = null;
 				}
 			}
 		}
 		// update the movesFromParent -of the head
 		T.moveFromParent = oldP.y + " " + oldP.x + " " + p.y + " " + p.x;
 		// update the heads
-		T.heads.get(T.heads.indexOf(oldP)).translate(move.x, move.y);
-		
+		T.heads.set(T.heads.indexOf(oldP), p);
 		this.children.push(T);
 		return T;
 	}
