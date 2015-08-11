@@ -1,4 +1,6 @@
 import java.awt.Point;
+import java.util.Comparator;
+import java.util.PriorityQueue;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Stack;
@@ -7,10 +9,15 @@ public class Tray implements Comparable<Tray>{
 	int xLength, yLength;
 	String moveFromParent;
 	Block[][] board;
-	
+	ArrayList<String> lineGoal;
 	ArrayList<Point> heads;
+	ArrayList<Point> blockSizes;
+	int[] goalsIndx;
 	Tray parentTray;
+	int myPriority;
 	public int yLenght;
+	double myDistance;
+	
 	static Point[] moves = { new Point(0, -1), new Point(0, +1),
 			new Point(-1, 0), new Point(+1, 0) };
 
@@ -21,8 +28,8 @@ public class Tray implements Comparable<Tray>{
 	 *            lines in the init file passes as ArrayList of Strings
 	 */
 
-	public Tray(ArrayList<String> lineInitArr) {
-	
+	public Tray(ArrayList<String> lineInitArr, ArrayList<String> lineGoalArr) {
+		lineGoal= lineGoalArr;
 		xLength = Integer.parseInt(lineInitArr.get(0).split("\\s+")[1]);
 		yLength = Integer.parseInt(lineInitArr.get(0).split("\\s+")[0]);
 		this.board = new Block[this.yLength][this.xLength];
@@ -34,7 +41,10 @@ public class Tray implements Comparable<Tray>{
 		int ybottom;
 		int xsize;
 		int ysize;
+		goalsIndx = new int[lineGoalArr.size()];
 		heads= new ArrayList<Point>();
+		blockSizes = new ArrayList<Point>();
+		
 		for (String line : lineInitArr.subList(1, lineInitArr.size())) {
 			xtop = Integer.parseInt(line.split("\\s+")[1]);
 			ytop = Integer.parseInt(line.split("\\s+")[0]);
@@ -44,23 +54,67 @@ public class Tray implements Comparable<Tray>{
 			xsize = xbottom - xtop+1;
 			ysize = ybottom - ytop+1;
 			Block b = new Block(ysize, xsize);
+			blockSizes.add(new Point(xsize,ysize));
 			for (int j = ytop; j <= ybottom; j++) {
 				for (int i = xtop; i <= xbottom; i++) {
 					this.board[j][i] = b;
 				}
 			}
-
 		}
+		int count = 0;
+		int neededToBeGoal = lineGoal.size();
+		int counter = 0;
+		for (String line : lineGoal) {
+			xtop = Integer.parseInt(line.split("\\s+")[1]);
+			ytop = Integer.parseInt(line.split("\\s+")[0]);
+			Point P = new Point(xtop, ytop);
+			xbottom = Integer.parseInt(line.split("\\s+")[3]);
+			ybottom = Integer.parseInt(line.split("\\s+")[2]);
+			xsize = xbottom - xtop+1;
+			ysize = ybottom - ytop+1;
+			Point SizeOfGoalBlock=new Point(xsize,ysize) ;
+			
+			if(blockSizes.contains(SizeOfGoalBlock)){
+				
+				goalsIndx[counter] = blockSizes.indexOf(SizeOfGoalBlock);
+				blockSizes.remove(goalsIndx[counter]);
+				Point Br = heads.get(goalsIndx[counter]);
+				myDistance += P.distance(Br);
+			}
+			counter++;
+//			 if we have the head in the current Tray
+			if (heads.contains(P)) {
+				
+				Point P1 = new Point(xbottom, ybottom);
+
+				int x = xtop + board[ytop][xtop].size.x - 1;
+				int y = ytop + board[ytop][xtop].size.y - 1;
+				Point PB = new Point(x, y);
+				// if the Bottom of the Goal matches the Bottom of the Given
+				// Block
+				if (P1.equals(PB)) {
+					count++;
+				}
+			}
+			
+			
+			
+			
+		}
+		myPriority= neededToBeGoal-count;
 	}
 
+	
 	/**
 	 * use to construct a tray which will end up being the children of the Tray
 	 * 
 	 * @param pTray
 	 *            the parent Tray to the Tray being created
 	 */
-	@SuppressWarnings("unchecked")
+
 	public Tray(Tray pTray) {
+		lineGoal= pTray.lineGoal;
+		goalsIndx = pTray.goalsIndx;
 		// does noting
 		xLength = pTray.xLength;
 		yLength = pTray.yLength;
@@ -88,6 +142,54 @@ public class Tray implements Comparable<Tray>{
 		
 	}
 
+	public void setMyPriority(){
+		// for the Goal...
+		int xtop;
+		int ytop;
+		int xbottom;
+		int ybottom;
+		int count = 0;
+		
+		int counter=0;
+		
+		int neededToBeGoal = lineGoal.size();
+		for (String line : lineGoal) {
+			xtop = Integer.parseInt(line.split("\\s+")[1]);
+			ytop = Integer.parseInt(line.split("\\s+")[0]);
+			Point P = new Point(xtop, ytop);
+			xbottom = Integer.parseInt(line.split("\\s+")[3]);
+			ybottom = Integer.parseInt(line.split("\\s+")[2]);
+			
+			Point Br = heads.get(goalsIndx[counter]);
+			myDistance += P.distance(Br);
+
+			counter++;
+			
+			
+			
+			// if we have the head in the current Tray
+			if (heads.contains(P)) {
+				xbottom = Integer.parseInt(line.split("\\s+")[3]);
+				ybottom = Integer.parseInt(line.split("\\s+")[2]);
+				Point P1 = new Point(xbottom, ybottom);
+
+				int x = xtop + board[ytop][xtop].size.x - 1;
+				int y = ytop + board[ytop][xtop].size.y - 1;
+				Point PB = new Point(x, y);
+				// if the Bottom of the Goal matches the Bottom of the Given
+				// Block
+				if (P1.equals(PB)) {
+					count++;
+				}
+				
+				
+				
+				
+			}
+		}
+		myPriority= neededToBeGoal-count;
+	}
+	
 	/**
 	 * Returns a string of all blocks positions Concatenated to make a unique
 	 * hash value
@@ -118,6 +220,7 @@ public class Tray implements Comparable<Tray>{
 		return S;
 	}
 
+	
 	/**
 	 * returns true if the given block can move in the given direction move from
 	 * the current location
@@ -245,7 +348,7 @@ public class Tray implements Comparable<Tray>{
 
 		
 		T.heads.set(T.heads.indexOf(oldTopLeft), newTopLeft);
-		
+		T.setMyPriority();
 		return T;
 	}
 

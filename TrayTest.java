@@ -27,6 +27,7 @@ public class TrayTest extends TestCase {
 		// check the board and the block
 		assertTrue(T.board[0][0].size().equals(P1));
 		assertTrue(T.board[1][1].size().equals(P1));
+	
 		
 	}
 	
