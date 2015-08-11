@@ -3,7 +3,6 @@ import java.awt.Point;
 
 public class Block {
 	Point size;
-	
 	/**
 	 * sets the size of this block
 	 * @param yLength
@@ -15,9 +14,6 @@ public class Block {
 	public Block(int yLength, int xLength){
 		size= new Point(xLength,yLength);
 	}
-	
-	
-	
 	/**
 	 * returns the size of this block
 	 * @return
@@ -26,9 +22,4 @@ public class Block {
 	public Point size(){
 		return size;
 	}
-	
-	
-	
 }
-
-

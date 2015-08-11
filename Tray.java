@@ -6,18 +6,31 @@ import java.util.ArrayList;
 import java.util.Stack;
 
 public class Tray implements Comparable<Tray>{
+	// the size of the Trays 
 	int xLength, yLength;
+	// Stores a String that tells the move made from parent to child
 	String moveFromParent;
+	// block array that acts as the board for keeping track of index
 	Block[][] board;
+	// array list that contains string with each index a line from Init file
 	ArrayList<String> lineGoal;
+	// array list that contains Point objects with each representing the location
+	// of the top left corner 
 	ArrayList<Point> heads;
+	// array list that contains Point objects with each representing the size
+	// of a block
 	ArrayList<Point> blockSizes;
+	// int array used to keep track of the goal associated with a specific block 
+	// in heads array 
 	int[] goalsIndx;
+	// a Tray object the tell the parent of a given tray
 	Tray parentTray;
+	// an integer that tell u the number of goals this tray has not satisfied
 	int myPriority;
-	public int yLenght;
+	// a Double that has some representation of the distance of all  the blocks from their 
+	// goal destination 
 	double myDistance;
-	
+	// a Point array that contains the possible movement of an block on the board
 	static Point[] moves = { new Point(0, -1), new Point(0, +1),
 			new Point(-1, 0), new Point(+1, 0) };
 
@@ -141,7 +154,10 @@ public class Tray implements Comparable<Tray>{
 		}
 		
 	}
-
+/**
+ * a method used to set myPrioriy and myDistance in order to be used 
+ * for the priority queue
+ */
 	public void setMyPriority(){
 		// for the Goal...
 		int xtop;
@@ -149,9 +165,7 @@ public class Tray implements Comparable<Tray>{
 		int xbottom;
 		int ybottom;
 		int count = 0;
-		
 		int counter=0;
-		
 		int neededToBeGoal = lineGoal.size();
 		for (String line : lineGoal) {
 			xtop = Integer.parseInt(line.split("\\s+")[1]);
@@ -159,14 +173,9 @@ public class Tray implements Comparable<Tray>{
 			Point P = new Point(xtop, ytop);
 			xbottom = Integer.parseInt(line.split("\\s+")[3]);
 			ybottom = Integer.parseInt(line.split("\\s+")[2]);
-			
 			Point Br = heads.get(goalsIndx[counter]);
 			myDistance += P.distance(Br);
-
 			counter++;
-			
-			
-			
 			// if we have the head in the current Tray
 			if (heads.contains(P)) {
 				xbottom = Integer.parseInt(line.split("\\s+")[3]);
@@ -181,10 +190,6 @@ public class Tray implements Comparable<Tray>{
 				if (P1.equals(PB)) {
 					count++;
 				}
-				
-				
-				
-				
 			}
 		}
 		myPriority= neededToBeGoal-count;
@@ -211,16 +216,9 @@ public class Tray implements Comparable<Tray>{
 			}else{
 				S += P.y +" "+ P.x +" "+ ybottom+ " "+ xbottom;				
 			}
-			
-//			if(counter<size){
-//				S += P.y +" "+ P.x +" "+ ybottom+ " "+ xbottom;
-//			}
-		
 		}
 		return S;
 	}
-
-	
 	/**
 	 * returns true if the given block can move in the given direction move from
 	 * the current location
@@ -338,15 +336,7 @@ public class Tray implements Comparable<Tray>{
 	
 			}
 		}
-
-////		// update the movesFromParent -of the head
 		T.moveFromParent = oldTopLeft.y + " " + oldTopLeft.x + " " + newTopLeft.y + " " + newTopLeft.x;
-//		// update the heads
-		//Point phead = T.heads.remove(T.heads.indexOf(oldTopLeft));
-		//phead.translate(move.x, move.y);
-		//T.heads.add(phead);
-
-		
 		T.heads.set(T.heads.indexOf(oldTopLeft), newTopLeft);
 		T.setMyPriority();
 		return T;
@@ -385,7 +375,9 @@ public class Tray implements Comparable<Tray>{
 	}
 
 	
-	
+	/**
+	 * used in the creation of the SasSet in the Solver class...  
+	 */
 	@Override
 	public int hashCode(){
 		String s = this.toString();
@@ -396,17 +388,12 @@ public class Tray implements Comparable<Tray>{
 		}
 		return hash;
 	}
-//
-//	@Override
-//	public int hashCode(){
-//		return this.toString().hashCode();
-//	}
-	
-	
+	/**
+	 *  not Used... have to have in order to implement Comparable
+	 */
 	@Override
 	public int compareTo(Tray o) {
 		// TODO Auto-generated method stub
 		return 0;
 	}
-	
 }

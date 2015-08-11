@@ -10,27 +10,29 @@ import java.util.HashSet;
 import java.util.Stack;
 
 public class Solver {
+	// array list that contains string with each index a line from Init file
 	ArrayList<String> lineInit;
+	// array list that contains string with each index a line from Goal file
 	ArrayList<String> lineGoal;
+	// String used to change from Linux to Windows format
 	static String BS = "/";
+	// String used to get the current directory
 	static String currDir = System.getProperty("user.dir") + BS;
-	// Stack<Tray> fringe;
-	 HashSet<String> visited;
+	// a HashSet of "Srtring" that keeps track of visited Tray objects 
+	HashSet<String> visited;
+	// the initial Tray Objects
 	Tray initTray; // update in isValidInput
+	// comparator used to create a compare method of the PriorityQueue
 	Comparator<Tray> comparator = new trayComparator();
+	// used to store the tray in the faring according to closeness to solution
 	PriorityQueue<Tray> queue = new PriorityQueue<Tray>(50, comparator);
-
 	/**
 	 * Initialize null to all instance variables
 	 */
 	public Solver() {
-		// should be initialized in the isvalidinput method
-
 		lineInit = new ArrayList<String>();
 		lineGoal = new ArrayList<String>();
-		//fringe = new Stack<Tray>();
 		visited = new HashSet<String>();
-
 	}
 
 	/**
@@ -38,7 +40,7 @@ public class Solver {
 	 */
 	public void solveIt() {
 		queue.add(initTray);
-		//fringe.push(initTray);
+		// fringe.push(initTray);
 
 		while (!queue.isEmpty()) {
 			Tray X = queue.poll();
@@ -68,7 +70,7 @@ public class Solver {
 
 	public boolean isGoal(Tray currTray) {
 		// lineGoal
-		if (currTray.myPriority==0){
+		if (currTray.myPriority == 0) {
 			return true;
 		}
 		return false;
@@ -110,21 +112,55 @@ public class Solver {
 			IOException {
 		fileReader(lineInit, args[0]);
 		fileReader(lineGoal, args[1]);
-		initTray = new Tray(lineInit,lineGoal);
+		if (lineInit.isEmpty() || lineGoal.isEmpty()) {
+			return false;
+		}
+		int xtop;
+		int ytop;
+		int xbottom = 0;
+		int ybottom = 0;
+		int xsize;
+		int ysize;
+		int count = 0;
+		int Xlenght = 0;
+		int Ylenght = 0;
+		String[] S;
+		for (String line : lineInit) {
+		
+			S = line.split("\\s+");
+			for(String s:S){
+				if(s.substring(0).matches("^[0-9]")){ // makes sure it is an positive integer... 
+					return false;
+				}
+			}
+			
+			if (count == 0 && !(S.length == 2)) {   // make sure there are that file line are specific size
+				return false;
+			} else if (count > 0 && !(S.length == 4)) {
+				return false;
+			}
+			xtop = Integer.parseInt(S[1]); // catch parse exception 
+			ytop = Integer.parseInt(S[0]);
+			if (count==0){
+				Xlenght=xtop ;
+				Ylenght=ytop ;
+			}
+			if (count > 0) {
+				xbottom = Integer.parseInt(S[3]);
+				ybottom = Integer.parseInt(S[2]);
+				xsize = xbottom - xtop + 1;
+				ysize = ybottom - ytop + 1;
+				if ( xsize<=0 || ysize<=0){ // positive int for size...
+					return false;
+				}
+			}
+			count++;
+		}
+		if ( xbottom>=Xlenght ||ybottom>=Ylenght){ // Boundary condition 
+			return false; 
+		}
+		initTray = new Tray(lineInit, lineGoal);
 		return true;
-		// check validity of args
-		/**
-		 * possible errors for init file
-		 * 
-		 * - no size of board - no blocks given - inputs are 4 integers
-		 * separated by space given as strings (unless first line) - first line
-		 * is size (two non negative integer inputs) - no block is outside the
-		 * boards of the tray - no blocks are overlapping - each number is
-		 * positive - each number is an integer -
-		 */
-
-		// update the fringe...(ie. create first Tray....)
-
 	}
 
 	/**
@@ -153,10 +189,10 @@ public class Solver {
 				}
 			}
 		} catch (FileNotFoundException e) {
-			System.out.println(file);
-
+			System.out.println("Invalid init and/or goal file.");
+		} catch (IOException i) {
+			System.out.println("Invalid init and/or goal file.");
 		}
-
 	}
 
 	/**
@@ -188,32 +224,41 @@ public class Solver {
 		//
 
 	}
+	
+	/**
+	 * a sub class used to create priority in priority queue
+	 * 
+	 * @author cs61bl-ch && cs61bl-hf
+	 * 
+	 */
 
 	public class trayComparator implements Comparator<Tray> {
+		/**
+		 * this method is used by the priority queue to set a min priority
+		 *      - if the tray has more blocks in the goal position it is given more priority
+		 *      - else if both are equal use the distance from the goals to set priority 
+		 * @param x,y
+		 *        Tray Object to be compared by priority... 
+		 *        
+		 */
 		@Override
 		public int compare(Tray x, Tray y) {
-			if (x.myPriority < y.myPriority)
-	        {
-	            return -1;
-	        }
-	        if (x.myPriority> y.myPriority)
-	        {
-	            return 1;
-	        }
-	        
-	        if (x.myDistance < y.myDistance)
-	        {
-	            return -1;
-	        }
-	        if (x.myDistance > y.myDistance)
-	        {
-	            return 1;
-	        }
-	        
-	        return 0;
-	    }
+			if (x.myPriority < y.myPriority) {
+				return -1;
+			}
+			if (x.myPriority > y.myPriority) {
+				return 1;
+			}
+
+			if (x.myDistance < y.myDistance) {
+				return -1;
+			}
+			if (x.myDistance > y.myDistance) {
+				return 1;
+			}
+
+			return 0;
 		}
-		
-		
 	}
 
+}
