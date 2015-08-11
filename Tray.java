@@ -65,8 +65,27 @@ public class Tray implements Comparable<Tray>{
 		xLength = pTray.xLength;
 		yLength = pTray.yLength;
 		parentTray = pTray;
-		heads = (ArrayList<Point>) pTray.heads.clone();
-		board = pTray.board.clone();
+		int xtop;
+		int ytop;
+		int xbottom;
+		int ybottom;
+		
+		board = new Block[this.yLength][this.xLength];
+		heads = new ArrayList<Point>();
+		for(Point p: pTray.heads){
+			heads.add(p);
+			xtop = p.x;
+			ytop = p.y;
+			xbottom = xtop+pTray.board[ytop][xtop].size().x-1;
+			ybottom = ytop+pTray.board[ytop][xtop].size().y-1;
+			Block b = pTray.board[ytop][xtop];
+			for (int j = ytop; j <= ybottom; j++) {
+				for (int i = xtop; i <= xbottom; i++) {
+					this.board[j][i] = b;
+				}
+			}
+		}
+		
 	}
 
 	/**
@@ -80,7 +99,7 @@ public class Tray implements Comparable<Tray>{
 		int size = heads.size();
 		int counter = 0;
 		for (Point P : heads) {
-			System.out.println("the head is" + P);
+			//System.out.println("the head is" + P);
 			Block B = board[P.y][P.x];
 			int xbottom = P.x + B.size.x - 1;
 			int ybottom = P.y + B.size.y - 1;
@@ -90,6 +109,11 @@ public class Tray implements Comparable<Tray>{
 			}else{
 				S += P.y +" "+ P.x +" "+ ybottom+ " "+ xbottom;				
 			}
+			
+//			if(counter<size){
+//				S += P.y +" "+ P.x +" "+ ybottom+ " "+ xbottom;
+//			}
+		
 		}
 		return S;
 	}
@@ -183,19 +207,19 @@ public class Tray implements Comparable<Tray>{
 		//System.out.println(T);
 		// update T...
 		Block b = board[oldTopLeft.y][oldTopLeft.x];
-		
+		Point oldBottomRight = new Point(oldTopLeft.x + block.size().x-1, oldTopLeft.y + block.size().y-1);
 		Point newTopLeft     = new Point(oldTopLeft.x + move.x, oldTopLeft.y + move.y);
 		Point newBottomRight = new Point(newTopLeft.x + block.size().x-1, newTopLeft.y + block.size().y-1);
 		
 		if ( move.y > 0 ) {
 				for (int i = newTopLeft.x; i <= newBottomRight.x; i++) {
 					T.board[newBottomRight.y][i] = b;
-					T.board[newTopLeft.y][i]     = null;
+					T.board[oldTopLeft.y][i]     = null;
 				}
 
 		} else if ( move.y<0 ){
 			for (int i = newTopLeft.x; i <= newBottomRight.x; i++) {
-				T.board[newBottomRight.y][i] = null;
+				T.board[oldBottomRight.y][i] = null;
 				T.board[newTopLeft.y][i]     = b;
 			}
 
@@ -206,7 +230,7 @@ public class Tray implements Comparable<Tray>{
 			}
 		} else if( move.x < 0 ){
 			for (int j = newTopLeft.y; j <= newBottomRight.y; j++) {
-				T.board[j][newBottomRight.x] = null;
+				T.board[j][oldBottomRight.x] = null;
 				T.board[j][newTopLeft.x]     = b;
 	
 			}
@@ -215,9 +239,13 @@ public class Tray implements Comparable<Tray>{
 ////		// update the movesFromParent -of the head
 		T.moveFromParent = oldTopLeft.y + " " + oldTopLeft.x + " " + newTopLeft.y + " " + newTopLeft.x;
 //		// update the heads
-		Point phead = T.heads.remove(T.heads.indexOf(oldTopLeft));
-		phead.translate(move.x, move.y);
-		T.heads.add(phead);
+		//Point phead = T.heads.remove(T.heads.indexOf(oldTopLeft));
+		//phead.translate(move.x, move.y);
+		//T.heads.add(phead);
+
+		
+		T.heads.set(T.heads.indexOf(oldTopLeft), newTopLeft);
+		
 		return T;
 	}
 
@@ -230,7 +258,7 @@ public class Tray implements Comparable<Tray>{
 		for (Point h : heads) {
 			for (Point move : moves) {
 				if (canMove(board[h.y][h.x], h, move)) {
-					System.out.println("can move");
+					
 					children.add(move(board[h.y][h.x], h, move));
 					
 				}
@@ -247,10 +275,10 @@ public class Tray implements Comparable<Tray>{
 	 *            the Tray object to be compared to this
 	 * @return true if they are equal else returns false
 	 */
-	@Override
-	public boolean equals(Object T) {
-		T = (Tray) T;
-		return (this.toString().equals(T.toString()));
+	
+	public boolean equals(Tray T) {
+		Tray t = (Tray) T;
+		return (this.toString().equals(t.toString()));
 	}
 
 	
@@ -264,9 +292,14 @@ public class Tray implements Comparable<Tray>{
 			hash += str.hashCode()+101;
 		}
 		return hash;
-		
 	}
-
+//
+//	@Override
+//	public int hashCode(){
+//		return this.toString().hashCode();
+//	}
+	
+	
 	@Override
 	public int compareTo(Tray o) {
 		// TODO Auto-generated method stub

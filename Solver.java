@@ -34,19 +34,31 @@ public class Solver {
 	 */
 	public void solveIt() {
 		fringe.push(initTray);
+		//System.out.println("Length of fringe is: "+fringe.size());
+		//System.out.println("The trays in fringe are:");
+	
 		while (!fringe.isEmpty()) {
+//			for(Tray f: fringe){
+//				System.out.print("*");
+//				System.out.println(f);
+//				//System.out.println("Yeah");
+//			}
+
 			Tray X = fringe.pop();
-			System.out.println(X.toString());
+			//System.out.println(X);
 			if (isGoal(X)) {
-				System.out.println("Going home");
+				//System.out.println("Going home");
 				moves(X);
+				break;
 			} else {
-				
+//				for(Tray C:X.children()){
+//					System.out.println("child: "+C);
+//				}
 				for(Tray XChild: X.children()) {
-					System.out.println(XChild.toString());
+					//System.out.println(XChild.toString());
 					if (!fringe.contains(XChild)
 							&& !visited.contains(XChild.toString())) {
-						System.out.println("hi");
+						
 						fringe.add(XChild);
 					}
 
@@ -80,7 +92,7 @@ public class Solver {
 			ytop = Integer.parseInt(line.split("\\s+")[0]);
 			Point P = new Point(xtop, ytop);
 			// if we have the head in the current Tray
-			if (currTray.heads.contains(P)) {
+			if (currTray.heads.contains(P)) { //THIS IS A PROBLEM
 				xbottom = Integer.parseInt(line.split("\\s+")[3]);
 				ybottom = Integer.parseInt(line.split("\\s+")[2]);
 				Point P1 = new Point(xbottom, ybottom);

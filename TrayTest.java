@@ -107,7 +107,7 @@ public class TrayTest extends TestCase {
 //		assertTrue(NewT.parentTray.equals(T));
 		
 		// check that newT is the child of T
-		System.out.println("jackass");
+		
 		for(Tray C: T.children()){
 			System.out.println(C);
 		}
@@ -122,6 +122,11 @@ public class TrayTest extends TestCase {
 		assertTrue(NewT.heads.get(0).equals(P));
 		
 		
+		
+	}
+	
+	
+	public void testchildren(){
 		
 	}
 }
