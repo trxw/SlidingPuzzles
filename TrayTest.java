@@ -10,7 +10,7 @@ public class TrayTest extends TestCase {
 		arr.add("3 2");
 		arr.add("0 0 0 0");
 		arr.add("1 1 1 1");
-		Tray T= new Tray(arr);
+		Tray T= new Tray(arr,arr.subList(1, 2));
 		Point P= new Point(0,0);
 		Point P1= new Point(1,1);
 		// check the length of the tray
@@ -37,7 +37,7 @@ public class TrayTest extends TestCase {
 		arr.add("0 0 0 0");
 		arr.add("1 1 1 1");
 		arr.add("2 1 2 1");
-		Tray T= new Tray(arr);
+		Tray T= new Tray(arr, arr);
 		String S= "0 0 0 0\n1 1 1 1\n2 1 2 1";
 		
 		assertTrue(S.equals(T.toString()));
@@ -51,7 +51,7 @@ public class TrayTest extends TestCase {
 		arr.add("3 2");
 		arr.add("0 0 0 0");
 		arr.add("1 1 1 1");
-		Tray T= new Tray(arr);
+		Tray T= new Tray(arr, arr);
 		Point[] moves = { new Point(0, -1), new Point(0, +1),
 				new Point(-1, 0), new Point(+1, 0) };
 		Block B= T.board[0][0];

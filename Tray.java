@@ -74,6 +74,19 @@ public class Tray implements Comparable<Tray>{
 				}
 			}
 		}
+		
+		//Make sure the blocks in init do not overlap with each other
+		if(!initIsValid()){
+			System.out.println("hi");
+			System.out.println("Invalid init and/or goal file.");
+			System.exit(0);
+		}
+				
+				
+
+
+
+
 		int count = 0;
 		int neededToBeGoal = lineGoal.size();
 		int counter = 0;
@@ -92,8 +105,14 @@ public class Tray implements Comparable<Tray>{
 				goalsIndx[counter] = blockSizes.indexOf(SizeOfGoalBlock);
 				blockSizes.remove(goalsIndx[counter]);
 				Point Br = heads.get(goalsIndx[counter]);
-				myDistance += P.distance(Br);
+				if(myDistance<P.distance(Br)){
+					myDistance = P.distance(Br);
+				}
+			}else{
+				
+				System.exit(0);
 			}
+			
 			counter++;
 //			 if we have the head in the current Tray
 			if (heads.contains(P)) {
@@ -154,6 +173,31 @@ public class Tray implements Comparable<Tray>{
 		}
 		
 	}
+	
+	/**
+	 *check if init blocks overlap
+	
+	 * @return
+	 */
+	
+	public boolean initIsValid(){
+
+		for(Point p1: heads){
+			for(Point p2: heads){
+				if(!p2.equals(p1)){
+					if( (p1.x+this.board[p1.y][p1.x].size().x-1 >= p2.x) && (p2.x>=p1.x)
+							&& (p1.y+this.board[p1.y][p1.x].size().y-1 >= p2.y) && (p2.y>p1.y)){
+						return false;
+					}
+				}
+			}	
+		}
+		
+		return true;
+	}
+	
+
+	
 /**
  * a method used to set myPrioriy and myDistance in order to be used 
  * for the priority queue

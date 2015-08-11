@@ -113,6 +113,7 @@ public class Solver {
 		fileReader(lineInit, args[0]);
 		fileReader(lineGoal, args[1]);
 		if (lineInit.isEmpty() || lineGoal.isEmpty()) {
+			System.out.println("AA");
 			return false;
 		}
 		int xtop;
@@ -129,14 +130,20 @@ public class Solver {
 		
 			S = line.split("\\s+");
 			for(String s:S){
-				if(s.substring(0).matches("^[0-9]")){ // makes sure it is an positive integer... 
+				if(s.substring(0).matches("[^0-9]")){ // makes sure it is an positive integer... 
+					System.out.println("BB");
+
 					return false;
 				}
 			}
 			
 			if (count == 0 && !(S.length == 2)) {   // make sure there are that file line are specific size
+				System.out.println("CC");
+
 				return false;
 			} else if (count > 0 && !(S.length == 4)) {
+				System.out.println("DD");
+
 				return false;
 			}
 			xtop = Integer.parseInt(S[1]); // catch parse exception 
@@ -151,15 +158,20 @@ public class Solver {
 				xsize = xbottom - xtop + 1;
 				ysize = ybottom - ytop + 1;
 				if ( xsize<=0 || ysize<=0){ // positive int for size...
+					System.out.println("EE");
+
 					return false;
 				}
 			}
 			count++;
 		}
 		if ( xbottom>=Xlenght ||ybottom>=Ylenght){ // Boundary condition 
+			System.out.println("FF");
+
 			return false; 
 		}
 		initTray = new Tray(lineInit, lineGoal);
+
 		return true;
 	}
 
@@ -189,9 +201,9 @@ public class Solver {
 				}
 			}
 		} catch (FileNotFoundException e) {
-			System.out.println("Invalid init and/or goal file.");
+			System.out.println("1Invalid init and/or goal file.");
 		} catch (IOException i) {
-			System.out.println("Invalid init and/or goal file.");
+			System.out.println("2Invalid init and/or goal file.");
 		}
 	}
 
@@ -213,11 +225,11 @@ public class Solver {
 
 				s.solveIt();
 			} else {
-				System.out.println("Invalid init and/or goal file.");
+				System.out.println("3Invalid init and/or goal file.");
 			}
 			//
 		} else {
-			System.out.println("Invalid init and/or goal file.");
+			System.out.println("4Invalid init and/or goal file.");
 
 		}
 
@@ -249,13 +261,13 @@ public class Solver {
 			if (x.myPriority > y.myPriority) {
 				return 1;
 			}
-
-			if (x.myDistance < y.myDistance) {
-				return -1;
-			}
-			if (x.myDistance > y.myDistance) {
-				return 1;
-			}
+//
+//			if (x.myDistance < y.myDistance) {
+//				return -1;
+//			}
+//			if (x.myDistance > y.myDistance) {
+//				return 1;
+//			}
 
 			return 0;
 		}
