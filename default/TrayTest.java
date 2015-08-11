@@ -14,8 +14,8 @@ public class TrayTest extends TestCase {
 		Point P= new Point(0,0);
 		Point P1= new Point(1,1);
 		// check the length of the tray
-		assertTrue(T.xLenght==2);
-		assertTrue(T.yLenght==3);
+		assertTrue(T.xLength==2);
+		assertTrue(T.yLength==3);
 		// check the heads
 		assertTrue(T.heads.contains(P1));
 		assertTrue(T.heads.contains(P));
@@ -27,6 +27,7 @@ public class TrayTest extends TestCase {
 		// check the board and the block
 		assertTrue(T.board[0][0].size().equals(P1));
 		assertTrue(T.board[1][1].size().equals(P1));
+	
 		
 	}
 	
@@ -37,8 +38,10 @@ public class TrayTest extends TestCase {
 		arr.add("1 1 1 1");
 		arr.add("2 1 2 1");
 		Tray T= new Tray(arr);
-		String S= "000011112121";
+		String S= "0 0 0 0\n1 1 1 1\n2 1 2 1";
+		
 		assertTrue(S.equals(T.toString()));
+		
 	}
 	
 	
@@ -94,15 +97,22 @@ public class TrayTest extends TestCase {
 				new Point(-1, 0), new Point(+1, 0) };
 		Block B= T.board[0][0];
 		 Point oldP= T.heads.get(0);
+		System.out.println(T);
 		Tray NewT=  T.move(B, oldP, moves[3]);
+		
+		//System.out.println(NewT);
 		// check the move was executed on the newT
 		assertTrue(NewT.board[0][0]==null);
 		assertTrue(NewT.board[0][1]!=null);
 		// check that newT's parent is T
-		assertTrue(NewT.parentTray.equals(T));
+//		assertTrue(NewT.parentTray.equals(T));
 		
 		// check that newT is the child of T
-		assertTrue(T.children.peek().equals(NewT));
+		
+		for(Tray C: T.children()){
+			System.out.println(C);
+		}
+		//assertTrue(T.children().peek().equals(NewT));
 		
 		// check moveFromParent
 		String S= "0 0 0 1";
@@ -113,6 +123,11 @@ public class TrayTest extends TestCase {
 		assertTrue(NewT.heads.get(0).equals(P));
 		
 		
+		
+	}
+	
+	
+	public void testchildren(){
 		
 	}
 }

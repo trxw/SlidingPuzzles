@@ -1,4 +1,6 @@
 import java.awt.Point;
+import java.util.Comparator;
+import java.util.PriorityQueue;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -8,23 +10,28 @@ import java.util.HashSet;
 import java.util.Stack;
 
 public class Solver {
+	// array list that contains string with each index a line from Init file
 	ArrayList<String> lineInit;
+	// array list that contains string with each index a line from Goal file
 	ArrayList<String> lineGoal;
-	static String BS = "\\";
+	// String used to change from Linux to Windows format
+	static String BS = "/";
+	// String used to get the current directory
 	static String currDir = System.getProperty("user.dir") + BS;
-	Stack<Tray> fringe;
+	// a HashSet of "Srtring" that keeps track of visited Tray objects 
 	HashSet<String> visited;
+	// the initial Tray Objects
 	Tray initTray; // update in isValidInput
-
+	// comparator used to create a compare method of the PriorityQueue
+	Comparator<Tray> comparator = new trayComparator();
+	// used to store the tray in the faring according to closeness to solution
+	PriorityQueue<Tray> queue = new PriorityQueue<Tray>(50, comparator);
 	/**
 	 * Initialize null to all instance variables
 	 */
 	public Solver() {
-		// should be initialized in the isvalidinput method
-		
 		lineInit = new ArrayList<String>();
 		lineGoal = new ArrayList<String>();
-		fringe = new Stack<Tray>();
 		visited = new HashSet<String>();
 	}
 
@@ -32,23 +39,25 @@ public class Solver {
 	 * Solves the problem using implicit Graph
 	 */
 	public void solveIt() {
-		fringe.push(initTray);
-		while (!fringe.isEmpty()) {
-			Tray X = fringe.pop();
+		queue.add(initTray);
+		// fringe.push(initTray);
+
+		while (!queue.isEmpty()) {
+			Tray X = queue.poll();
 			if (isGoal(X)) {
 				moves(X);
+				break;
 			} else {
-				X.findLegitChildren();
-				for (Tray XChild : X.children) {
-					if (!fringe.contains(XChild)
+				for (Tray XChild : X.children()) {
+					if (!queue.contains(XChild)
 							&& !visited.contains(XChild.toString())) {
-						fringe.add(XChild);
+
+						queue.add(XChild);
 					}
 				}
-				visited.add(X.toString());
 			}
+			visited.add(X.toString());
 		}
-		// if no goal is reached by the end do noting and just exist
 	}
 
 	/**
@@ -61,34 +70,7 @@ public class Solver {
 
 	public boolean isGoal(Tray currTray) {
 		// lineGoal
-		int count = 0;
-		int neededToBeGoal = lineGoal.size();
-		// for the Goal...
-		int xtop;
-		int ytop;
-		int xbottom;
-		int ybottom;
-		for (String line : lineGoal) {
-			xtop = Integer.parseInt(line.split("\\s+")[1]);
-			ytop = Integer.parseInt(line.split("\\s+")[0]);
-			Point P = new Point(xtop, ytop);
-			// if we have the head in the current Tray
-			if (currTray.heads.contains(P)) {
-				xbottom = Integer.parseInt(line.split("\\s+")[3]);
-				ybottom = Integer.parseInt(line.split("\\s+")[2]);
-				Point P1 = new Point(xbottom, ybottom);
-
-				int x = xtop + currTray.board[ytop][xtop].size.x - 1;
-				int y = ytop + currTray.board[ytop][xtop].size.y - 1;
-				Point PB = new Point(x, y);
-				// if the Bottom of the Goal matches the Bottom of the Given
-				// Block
-				if (P1.equals(PB)) {
-					count++;
-				}
-			}
-		}
-		if (count == neededToBeGoal) {
+		if (currTray.myPriority == 0) {
 			return true;
 		}
 		return false;
@@ -96,10 +78,11 @@ public class Solver {
 
 	/**
 	 * prints out all the moves from the start to Goal(X)
+	 * 
 	 * @param X
 	 *            the Goal Tray
 	 */
-	
+
 	public void moves(Tray X) {
 		Stack<String> S = new Stack<String>();
 		// avoid visiting the first tray since it has no moves
@@ -117,60 +100,99 @@ public class Solver {
 	 * 
 	 * @param args
 	 *            a String Array that contains the file names for init and goal
-	 *            files - must initialize instant Variables
-	 *            args[0] is init file nae and args[1] is goal file name
-	 *            
+	 *            files - must initialize instant Variables args[0] is init file
+	 *            nae and args[1] is goal file name
+	 * 
 	 * @return true if the input files are valid else false - must be
 	 *         bullet-proof
-	 * @throws IOException 
-	 * @throws FileNotFoundException 
+	 * @throws IOException
+	 * @throws FileNotFoundException
 	 */
-	public boolean isValidInput(String[] args) throws FileNotFoundException, IOException {
-		fileReader( lineInit, args[0]);
-		fileReader( lineGoal, args[1]);
-		initTray= new Tray(lineInit);
+	public boolean isValidInput(String[] args) throws FileNotFoundException,
+			IOException {
+		fileReader(lineInit, args[0]);
+		fileReader(lineGoal, args[1]);
+		if (lineInit.isEmpty() || lineGoal.isEmpty()) {
+			return false;
+		}
+		int xtop;
+		int ytop;
+		int xbottom = 0;
+		int ybottom = 0;
+		int xsize;
+		int ysize;
+		int count = 0;
+		int Xlenght = 0;
+		int Ylenght = 0;
+		String[] S;
+		for (String line : lineInit) {
+		
+			S = line.split("\\s+");
+			for(String s:S){
+				if(s.substring(0).matches("^[0-9]")){ // makes sure it is an positive integer... 
+					return false;
+				}
+			}
+			
+			if (count == 0 && !(S.length == 2)) {   // make sure there are that file line are specific size
+				return false;
+			} else if (count > 0 && !(S.length == 4)) {
+				return false;
+			}
+			xtop = Integer.parseInt(S[1]); // catch parse exception 
+			ytop = Integer.parseInt(S[0]);
+			if (count==0){
+				Xlenght=xtop ;
+				Ylenght=ytop ;
+			}
+			if (count > 0) {
+				xbottom = Integer.parseInt(S[3]);
+				ybottom = Integer.parseInt(S[2]);
+				xsize = xbottom - xtop + 1;
+				ysize = ybottom - ytop + 1;
+				if ( xsize<=0 || ysize<=0){ // positive int for size...
+					return false;
+				}
+			}
+			count++;
+		}
+		if ( xbottom>=Xlenght ||ybottom>=Ylenght){ // Boundary condition 
+			return false; 
+		}
+		initTray = new Tray(lineInit, lineGoal);
 		return true;
-		
-		// check validity of args
-		/**
-		 * possible errors for init file
-		 * 
-		 * - no size of board - no blocks given - inputs are 4 integers
-		 * separated by space given as strings (unless first line) - first line
-		 * is size (two non negative integer inputs) - no block is outside the
-		 * boards of the tray - no blocks are overlapping - each number is
-		 * positive - each number is an integer -
-		 */
-
-		// update the fringe...(ie. create first Tray....)
-		
 	}
 
 	/**
-	 * Reads given file line by line and adds it to the given 
-	 * ArrayList as a String
+	 * Reads given file line by line and adds it to the given ArrayList as a
+	 * String
 	 * 
 	 * @param lineArr
-	 *       pointer to the ArrayList to add the read lines
+	 *            pointer to the ArrayList to add the read lines
 	 * @param fileName
-	 *         name of the file to be read (lineInit or lineGoal)
+	 *            name of the file to be read (lineInit or lineGoal)
 	 * @throws IOException
-	 *          not handled (assume that isValidinput was true)
+	 *             not handled (assume that isValidinput was true)
 	 * @throws FileNotFoundException
-	 *		  not handled (assume that isValidinput was true)
+	 *             not handled (assume that isValidinput was true)
 	 */
 
 	public void fileReader(ArrayList<String> lineArr, String fileName)
 			throws FileNotFoundException, IOException {
 		String file = currDir + fileName;
-		try (BufferedReader br = new BufferedReader(new FileReader(file))) {
-			String linePotato;
-			while ((linePotato = br.readLine()) != null) {
-				// process the line.
-				lineArr.add(linePotato);
+		try {
+			try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+				String linePotato;
+				while ((linePotato = br.readLine()) != null) {
+					// process the line.
+					lineArr.add(linePotato);
+				}
 			}
+		} catch (FileNotFoundException e) {
+			System.out.println("Invalid init and/or goal file.");
+		} catch (IOException i) {
+			System.out.println("Invalid init and/or goal file.");
 		}
-			
 	}
 
 	/**
@@ -178,12 +200,12 @@ public class Solver {
 	 * 
 	 * @param args
 	 *            a String Array that contains the file names for init and goal
-	 *            files
-	 * 			 args[0] is init file nae and args[1] is goal file name
-	 * @throws IOException 
-	 * @throws FileNotFoundException 
+	 *            files args[0] is init file nae and args[1] is goal file name
+	 * @throws IOException
+	 * @throws FileNotFoundException
 	 */
-	public static void main(String[] args) throws FileNotFoundException, IOException {
+	public static void main(String[] args) throws FileNotFoundException,
+			IOException {
 		Solver s = new Solver();
 		if (args.length == 2) {
 			// check if args[0] and args[1] files exit
@@ -201,6 +223,42 @@ public class Solver {
 
 		//
 
+	}
+	
+	/**
+	 * a sub class used to create priority in priority queue
+	 * 
+	 * @author cs61bl-ch && cs61bl-hf
+	 * 
+	 */
+
+	public class trayComparator implements Comparator<Tray> {
+		/**
+		 * this method is used by the priority queue to set a min priority
+		 *      - if the tray has more blocks in the goal position it is given more priority
+		 *      - else if both are equal use the distance from the goals to set priority 
+		 * @param x,y
+		 *        Tray Object to be compared by priority... 
+		 *        
+		 */
+		@Override
+		public int compare(Tray x, Tray y) {
+			if (x.myPriority < y.myPriority) {
+				return -1;
+			}
+			if (x.myPriority > y.myPriority) {
+				return 1;
+			}
+
+			if (x.myDistance < y.myDistance) {
+				return -1;
+			}
+			if (x.myDistance > y.myDistance) {
+				return 1;
+			}
+
+			return 0;
+		}
 	}
 
 }
