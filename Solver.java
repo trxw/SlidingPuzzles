@@ -18,7 +18,7 @@ public class Solver {
 	static String BS = "/";
 	// String used to get the current directory
 	static String currDir = System.getProperty("user.dir") + BS;
-	// a HashSet of "Srtring" that keeps track of visited Tray objects 
+	// a HashSet of "Srtring" that keeps track of visited Tray objects
 	HashSet<String> visited;
 	// the initial Tray Objects
 	Tray initTray; // update in isValidInput
@@ -62,7 +62,7 @@ public class Solver {
 
 	/**
 	 * returns true if the argument is equal to goal
-	 * 
+	 *
 	 * @param currTray
 	 *            the current Tray under examination
 	 * @return true if tray is goal else false
@@ -78,7 +78,7 @@ public class Solver {
 
 	/**
 	 * prints out all the moves from the start to Goal(X)
-	 * 
+	 *
 	 * @param X
 	 *            the Goal Tray
 	 */
@@ -97,12 +97,12 @@ public class Solver {
 
 	/**
 	 * checks if the input files init and goal are valid
-	 * 
+	 *
 	 * @param args
 	 *            a String Array that contains the file names for init and goal
 	 *            files - must initialize instant Variables args[0] is init file
 	 *            nae and args[1] is goal file name
-	 * 
+	 *
 	 * @return true if the input files are valid else false - must be
 	 *         bullet-proof
 	 * @throws IOException
@@ -127,16 +127,16 @@ public class Solver {
 		int Ylenght = 0;
 		String[] S;
 		for (String line : lineInit) {
-		
+
 			S = line.split("\\s+");
 			for(String s:S){
-				if(s.substring(0).matches("[^0-9]")){ // makes sure it is an positive integer... 
+				if(s.substring(0).matches("[^0-9]")){ // makes sure it is an positive integer...
 					System.out.println("BB");
 
 					return false;
 				}
 			}
-			
+
 			if (count == 0 && !(S.length == 2)) {   // make sure there are that file line are specific size
 				System.out.println("CC");
 
@@ -146,7 +146,7 @@ public class Solver {
 
 				return false;
 			}
-			xtop = Integer.parseInt(S[1]); // catch parse exception 
+			xtop = Integer.parseInt(S[1]); // catch parse exception
 			ytop = Integer.parseInt(S[0]);
 			if (count==0){
 				Xlenght=xtop ;
@@ -165,10 +165,10 @@ public class Solver {
 			}
 			count++;
 		}
-		if ( xbottom>=Xlenght ||ybottom>=Ylenght){ // Boundary condition 
+		if ( xbottom>=Xlenght ||ybottom>=Ylenght){ // Boundary condition
 			System.out.println("FF");
 
-			return false; 
+			return false;
 		}
 		initTray = new Tray(lineInit, lineGoal);
 
@@ -178,7 +178,7 @@ public class Solver {
 	/**
 	 * Reads given file line by line and adds it to the given ArrayList as a
 	 * String
-	 * 
+	 *
 	 * @param lineArr
 	 *            pointer to the ArrayList to add the read lines
 	 * @param fileName
@@ -209,7 +209,7 @@ public class Solver {
 
 	/**
 	 * operates the Game!
-	 * 
+	 *
 	 * @param args
 	 *            a String Array that contains the file names for init and goal
 	 *            files args[0] is init file nae and args[1] is goal file name
@@ -236,22 +236,22 @@ public class Solver {
 		//
 
 	}
-	
+
 	/**
 	 * a sub class used to create priority in priority queue
-	 * 
+	 *
 	 * @author cs61bl-ch && cs61bl-hf
-	 * 
+	 *
 	 */
 
 	public class trayComparator implements Comparator<Tray> {
 		/**
 		 * this method is used by the priority queue to set a min priority
 		 *      - if the tray has more blocks in the goal position it is given more priority
-		 *      - else if both are equal use the distance from the goals to set priority 
+		 *      - else if both are equal use the distance from the goals to set priority
 		 * @param x,y
-		 *        Tray Object to be compared by priority... 
-		 *        
+		 *        Tray Object to be compared by priority...
+		 *
 		 */
 		@Override
 		public int compare(Tray x, Tray y) {
